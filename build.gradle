@@ -1,5 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def devUser = properties.getProperty('devUser')
+def devPassword = properties.getProperty('devPassword')
+
 buildscript {
     repositories {
         jcenter()
@@ -22,8 +27,8 @@ allprojects {
         maven {
             url "http://dev-repo.magnet.com:8081/artifactory/everything"
             credentials {
-                username = "pritesh.shah"
-                password = "aardvark"
+                username = "${devUser}"
+                password = "${devPassword}"
             }
         }
 
