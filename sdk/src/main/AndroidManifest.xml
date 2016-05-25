@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/MagnetChatSDKTheme">
         <activity
-            android:name=".ui.activities.ChatListActivity"
+            android:name=".ui.activities.ChannelListActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
@@ -40,9 +40,26 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
             android:screenOrientation="portrait"
             android:theme="@style/MagnetChatSDKTheme" />
+
         <activity
-            android:name="nl.changer.polypicker.ImagePickerActivity"
-            android:theme="@style/MagnetChatSDKTheme" />
+            android:name=".ui.activities.MMXChatActivity"
+            android:label="@string/mmx.chat"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.activities.MMXChatDetailsActivity"
+            android:label="@string/mmx.chat.details"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.activities.MMXUsersActivity"
+            android:label="@string/mmx.users.all.title"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.activities.MMXEditPollActivity"
+            android:label="@string/mmx.poll.create"
+            android:screenOrientation="portrait" />
 
         <receiver
             android:name="com.magnet.mmx.client.MMXGcmBroadcastReceiver"

@@ -20,8 +20,8 @@ import com.magnet.magnetchat.callbacks.OnRecyclerViewItemClickListener;
 import com.magnet.magnetchat.core.managers.ChatManager;
 import com.magnet.magnetchat.helpers.ChannelHelper;
 import com.magnet.magnetchat.model.Chat;
-import com.magnet.magnetchat.mvp.api.ChatListContract;
-import com.magnet.magnetchat.mvp.presenters.ChatListPresenterImpl;
+import com.magnet.magnetchat.presenters.ChatListContract;
+import com.magnet.magnetchat.presenters.impl.ChatListPresenterImpl;
 import com.magnet.magnetchat.ui.activities.ChatActivity;
 import com.magnet.magnetchat.ui.activities.ChooseUserActivity;
 import com.magnet.magnetchat.ui.adapters.ChatsAdapter;
@@ -30,7 +30,8 @@ import com.magnet.magnetchat.ui.views.DividerItemDecoration;
 
 import java.util.List;
 
-public class ChatListFragment extends BaseFragment implements ChatListContract.View {
+@Deprecated
+public class ChatListFragment extends MMXBaseFragment implements ChatListContract.View {
     private final static String TAG = "ChatListFragment";
 
     private RecyclerView conversationsList;
@@ -174,7 +175,7 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
                 });
                 conversationsList.setAdapter(mAdapter);
             } else {
-                if(toAppend) {
+                if (toAppend) {
                     mAdapter.addItem(list);
                 } else {
                     mAdapter.swapData(list);
@@ -222,7 +223,8 @@ public class ChatListFragment extends BaseFragment implements ChatListContract.V
         leaveDialog.show();
     }
 
-    @Override public void setTitle(String title) {
+    @Override
+    public void setTitle(String title) {
 
     }
 

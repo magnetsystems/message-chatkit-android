@@ -15,8 +15,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import com.magnet.magnetchat.helpers.SnackNotificationHelper;
-import com.magnet.magnetchat.util.AppLogger;
+import com.magnet.magnetchat.util.Logger;
 import com.magnet.max.android.util.StringUtil;
 
 public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
@@ -114,6 +116,29 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     public void showMessage(int stringRes) {
         showMessage(getString(stringRes));
     }
+
+
+    /**
+     * the methods are wrappers for toast notification
+     *
+     * @see Toast
+     */
+    public void toast(CharSequence message, boolean isLongShow) {
+        Toast.makeText(this, message, isLongShow ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+    }
+
+    public void toast(CharSequence message) {
+        toast(message, false);
+    }
+
+    public void toast(int resId, boolean isLongShow) {
+        Toast.makeText(this, resId, isLongShow ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+    }
+
+    public void toast(int resId) {
+        toast(resId, false);
+    }
+
 
     @Override
     protected void onPause() {
@@ -243,7 +268,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * @param data current intent
      */
     protected void onActivityResult(int requestCode, Intent data) {
-        AppLogger.info(this, String.format("%d", requestCode), data.toString());
+        Logger.debug(getClass().getSimpleName(), this, String.format("%d", requestCode), data.toString());
     }
 
     /**
@@ -342,8 +367,15 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         try {
             imageView.setImageBitmap(BitmapFactory.decodeFile(path));
         } catch (Exception ex) {
-            AppLogger.error(this, ex.toString());
+            Logger.error(ex);
         }
+    }
+
+    /**
+     * The method provides autocast findById method
+     */
+    protected <T extends View> T findView(int resId) {
+        return (T) findViewById(resId);
     }
 
     @Override

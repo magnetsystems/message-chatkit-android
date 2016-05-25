@@ -5,28 +5,31 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.model.Chat;
-import com.magnet.magnetchat.mvp.api.ChatDetailsContract;
-import com.magnet.magnetchat.mvp.presenters.ChatDetailsPresenterImpl;
+import com.magnet.magnetchat.presenters.ChatDetailsContract;
+import com.magnet.magnetchat.presenters.impl.ChatDetailsPresenterImpl;
 import com.magnet.magnetchat.ui.adapters.UserProfilesAdapter;
 import com.magnet.max.android.UserProfile;
 import com.magnet.mmx.client.api.MMXChannel;
 
 import java.util.List;
 
-
-public class ChatDetailsActivity extends BaseActivity implements ChatDetailsContract.View {
+@Deprecated
+public class ChatDetailsActivity extends BaseActivity implements ChatDetailsContract.View, CompoundButton.OnCheckedChangeListener {
 
     public static final String TAG_CHANNEL = "channel";
 
+    SwitchCompat uiMute;
     RecyclerView listView;
     UserProfilesAdapter mUserAdapter;
 
@@ -65,12 +68,6 @@ public class ChatDetailsActivity extends BaseActivity implements ChatDetailsCont
 
         MMXChannel currentChannel = getIntent().getParcelableExtra(TAG_CHANNEL);
         if (currentChannel != null) {
-//            if (StringUtil.isStringValueEqual(currentChannel.getOwnerId(), User.getCurrentUserId())) {
-//                llAddRecipients.setVisibility(View.VISIBLE);
-//
-//                setOnClickListeners(llAddRecipients);
-//            }
-
             mPresenter = new ChatDetailsPresenterImpl(this, currentChannel, this);
             mPresenter.onLoadRecipients(true);
         } else {
@@ -87,10 +84,13 @@ public class ChatDetailsActivity extends BaseActivity implements ChatDetailsCont
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mPresenter.isChannelOwner()) {
-            int menuId = R.menu.menu_chat_details;
-            getMenuInflater().inflate(menuId, menu);
-        }
+//        if (mPresenter.isChannelOwner()) {
+        int menuId = R.menu.menu_chat_details;
+        getMenuInflater().inflate(menuId, menu);
+        uiMute = (SwitchCompat) menu.findItem(R.id.mmx_mute).getActionView();
+        uiMute.setOnCheckedChangeListener(this);
+        mPresenter.requestMuteChannelState();
+//        }
         return true;
     }
 
@@ -100,7 +100,7 @@ public class ChatDetailsActivity extends BaseActivity implements ChatDetailsCont
         int itemID = item.getItemId();
         if (itemID == android.R.id.home) {
             finish();
-        } else if (itemID == R.id.menuItemAddUser) {
+        } else if (itemID == R.id.mmx_add) {
             mPresenter.onAddRecipients();
         }
 
@@ -119,9 +119,14 @@ public class ChatDetailsActivity extends BaseActivity implements ChatDetailsCont
     }
 
     public static Intent createIntentForChannel(Context context, Chat conversation) {
+        return createIntentForChannel(context, conversation.getChannel());
+    }
+
+    public static Intent createIntentForChannel(Context context, MMXChannel mmxChannel) {
         Intent intent = new Intent(context, ChatDetailsActivity.class);
-        intent.putExtra(TAG_CHANNEL, conversation.getChannel());
+        intent.putExtra(TAG_CHANNEL, mmxChannel);
         return intent;
+
     }
 
 
@@ -150,5 +155,27 @@ public class ChatDetailsActivity extends BaseActivity implements ChatDetailsCont
     @Override
     public void finishDetails() {
         finish();
+    }
+
+    @Override
+    public void onMute(boolean isMuted) {
+        uiMute.setOnCheckedChangeListener(null);
+        uiMute.setChecked(isMuted);
+        uiMute.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    public void onMessage(int stringRes) {
+        toast(stringRes);
+    }
+
+    @Override
+    public void onMessage(CharSequence message) {
+        toast(message);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        mPresenter.changeMuteAction();
     }
 }

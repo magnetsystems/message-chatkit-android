@@ -8,16 +8,24 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Parcelable;
 import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.magnet.magnetchat.Constants;
+import com.magnet.magnetchat.model.Chat;
+import com.magnet.max.android.User;
+import com.magnet.mmx.client.api.MMXChannel;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -366,15 +374,15 @@ public class IntentHelper {
      * @param scope You can restrict selection by passing required content type. Examples:
      *              <p/>
      *              <code><pre>
-     *                                                                                                                                                                                                                                                                                               // Select only from users with emails
-     *                                                                                                                                                                                                                                                                                               IntentUtils.pickContact(ContactsContract.CommonDataKinds.Email.CONTENT_TYPE);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              // Select only from users with emails
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              IntentUtils.pickContact(ContactsContract.CommonDataKinds.Email.CONTENT_TYPE);
      *              <p/>
-     *                                                                                                                                                                                                                                                                                               // Select only from users with phone numbers on pre Eclair devices
-     *                                                                                                                                                                                                                                                                                               IntentUtils.pickContact(Contacts.Phones.CONTENT_TYPE);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              // Select only from users with phone numbers on pre Eclair devices
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              IntentUtils.pickContact(Contacts.Phones.CONTENT_TYPE);
      *              <p/>
-     *                                                                                                                                                                                                                                                                                               // Select only from users with phone numbers on devices with Eclair and higher
-     *                                                                                                                                                                                                                                                                                               IntentUtils.pickContact(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-     *                                                                                                                                                                                                                                                                                               </pre></code>
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              // Select only from users with phone numbers on devices with Eclair and higher
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              IntentUtils.pickContact(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+     *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </pre></code>
      */
     public static Intent pickContact(String scope) {
         Intent intent;
@@ -514,4 +522,43 @@ public class IntentHelper {
     private static boolean isSupportsContactsV2() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR;
     }
+
+
+    public static Intent chatActivity(Context context, MMXChannel mmxChannel, Class<? extends Activity> clazz) {
+        Intent intent = null;
+        if (mmxChannel != null) {
+            intent = new Intent(context, clazz);
+            intent.putExtra(Constants.TAG_CHANNEL, mmxChannel);
+        }
+        return intent;
+    }
+
+    public static MMXChannel getMMXChannelFromIntent(Intent intent) {
+        if (intent == null) {
+            return null;
+        }
+
+        MMXChannel mmxChannel = intent.getParcelableExtra(Constants.TAG_CHANNEL);
+        return mmxChannel;
+    }
+
+    public static Intent chatActivity(Context context, Collection<User> recipients, Class<? extends Activity> clazz) {
+        Intent intent = new Intent(context, clazz);
+        ArrayList<User> arrayList;
+        if (recipients instanceof ArrayList) {
+            arrayList = (ArrayList<User>) recipients;
+        } else {
+            arrayList = new ArrayList<>(recipients);
+        }
+        intent.putParcelableArrayListExtra(Constants.TAG_CREATE_WITH_RECIPIENTS, arrayList);
+        return intent;
+    }
+
+    public static ArrayList<User> getRecipientsFromIntent(Intent intent) {
+        if (intent == null) return null;
+
+        ArrayList<User> list = intent.getParcelableArrayListExtra(Constants.TAG_CREATE_WITH_RECIPIENTS);
+        return list;
+    }
+
 }

@@ -22,8 +22,8 @@ import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.callbacks.EndlessLinearRecyclerViewScrollListener;
 import com.magnet.magnetchat.callbacks.OnRecyclerViewItemClickListener;
 import com.magnet.magnetchat.helpers.UserHelper;
-import com.magnet.magnetchat.mvp.api.ChooseUserContract;
-import com.magnet.magnetchat.mvp.presenters.ChooseUserPresenterImpl;
+import com.magnet.magnetchat.presenters.ChooseUserContract;
+import com.magnet.magnetchat.presenters.impl.ChooseUserPresenterImpl;
 import com.magnet.magnetchat.ui.adapters.SelectedUsersAdapter;
 import com.magnet.magnetchat.ui.adapters.UsersAdapter;
 import com.magnet.magnetchat.ui.custom.CustomSearchView;
@@ -32,17 +32,17 @@ import com.magnet.max.android.User;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Deprecated
 public class ChooseUserActivity extends BaseActivity implements ChooseUserContract.View {
     private static final String TAG = "ChooseUserActivity";
     public static final String TAG_ADD_USER_TO_CHANNEL = "onUsersSelected";
 
-    private RecyclerView userList;
+    private RecyclerView uiUserList;
     private RecyclerView selectedUserList;
-    private TextView tvSelectedAmount;
-    private LinearLayout llSelectedUsers;
-    private ProgressBar userSearchProgress;
-    private Toolbar toolbar;
+    private TextView uiTVSelectedAmount;
+    private LinearLayout uiLLSelectedUsers;
+    private ProgressBar uiUserSearchProgress;
+    private Toolbar uiToolbar;
 
     private UsersAdapter mAdapter;
     private SelectedUsersAdapter selectedAdapter;
@@ -59,20 +59,20 @@ public class ChooseUserActivity extends BaseActivity implements ChooseUserContra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        uiToolbar = findView(R.id.toolbar);
+        setSupportActionBar(uiToolbar);
 
-        setOnClickListeners(R.id.fabAdd);
+        findView(R.id.fabAdd).setOnClickListener(this);
+        uiTVSelectedAmount = findView(R.id.tvSelectedUsersAmount);
+        uiLLSelectedUsers = findView(R.id.llSelectedUsers);
+        uiUserSearchProgress = findView(R.id.chooseUserProgress);
+        uiUserList = findView(R.id.chooseUserList);
 
-        tvSelectedAmount = (TextView) findViewById(R.id.tvSelectedUsersAmount);
-        llSelectedUsers = (LinearLayout) findViewById(R.id.llSelectedUsers);
-        userSearchProgress = (ProgressBar) findViewById(R.id.chooseUserProgress);
-
-        userList = (RecyclerView) findViewById(R.id.chooseUserList);
         LinearLayoutManager userListLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        userList.setLayoutManager(userListLayoutManager);
-        userList.addOnScrollListener(new EndlessLinearRecyclerViewScrollListener(userListLayoutManager) {
-            @Override public void onLoadMore(int page, int totalItemsCount) {
+        uiUserList.setLayoutManager(userListLayoutManager);
+        uiUserList.addOnScrollListener(new EndlessLinearRecyclerViewScrollListener(userListLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
                 Log.d(TAG, "------------onLoadMore User: " + page + "/" + totalItemsCount + "\n");
                 mPresenter.onLoad(totalItemsCount, Constants.USER_PAGE_SIZE);
             }
@@ -113,7 +113,7 @@ public class ChooseUserActivity extends BaseActivity implements ChooseUserContra
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_choose_user, menu);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final CustomSearchView search = (CustomSearchView) menu.findItem(R.id.menuUserSearch).getActionView();
+            final CustomSearchView search = (CustomSearchView) menu.findItem(R.id.mmx_search).getActionView();
             search.setHint("Search contacts");
             search.setOnQueryTextListener(queryTextListener);
             search.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -146,8 +146,8 @@ public class ChooseUserActivity extends BaseActivity implements ChooseUserContra
      */
     @Override
     public void setProgressIndicator(boolean active) {
-        if (userSearchProgress != null) {
-            userSearchProgress.setVisibility(active ? View.VISIBLE : View.INVISIBLE);
+        if (uiUserSearchProgress != null) {
+            uiUserSearchProgress.setVisibility(active ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
@@ -160,11 +160,11 @@ public class ChooseUserActivity extends BaseActivity implements ChooseUserContra
     public void showUsers(@NonNull List<User> users, boolean toAppend) {
         if (null == mAdapter) {
             mAdapter =
-                new UsersAdapter(this, users, selectedUsers, mPresenter.getItemComparator());
-            userList.setAdapter(mAdapter);
+                    new UsersAdapter(this, users, selectedUsers, mPresenter.getItemComparator());
+            uiUserList.setAdapter(mAdapter);
             mAdapter.setOnClickListener(userClickListener);
         } else {
-            if(toAppend) {
+            if (toAppend) {
                 mAdapter.addItem(users);
             } else {
                 mAdapter.swapData(users);
@@ -177,6 +177,7 @@ public class ChooseUserActivity extends BaseActivity implements ChooseUserContra
      */
     @Override
     public void finishSelection() {
+        setResult(RESULT_OK);
         finish();
     }
 
@@ -240,10 +241,10 @@ public class ChooseUserActivity extends BaseActivity implements ChooseUserContra
                     selectedUsers.add(user);
                 }
                 if (selectedUsers.size() > 0) {
-                    tvSelectedAmount.setText(String.format("%d selected", selectedUsers.size()));
-                    llSelectedUsers.setVisibility(View.VISIBLE);
+                    uiTVSelectedAmount.setText(String.format("%d selected", selectedUsers.size()));
+                    uiLLSelectedUsers.setVisibility(View.VISIBLE);
                 } else {
-                    llSelectedUsers.setVisibility(View.GONE);
+                    uiLLSelectedUsers.setVisibility(View.GONE);
                 }
                 //mAdapter.notifyDataSetChanged();
                 selectedAdapter.notifyDataSetChanged();

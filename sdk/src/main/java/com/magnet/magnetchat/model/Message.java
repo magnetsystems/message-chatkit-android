@@ -1,9 +1,11 @@
 package com.magnet.magnetchat.model;
 
 import android.location.Location;
+
 import com.magnet.max.android.Attachment;
 import com.magnet.max.android.User;
 import com.magnet.mmx.client.api.MMXMessage;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -21,6 +23,7 @@ public class Message {
     public static final String TYPE_PHOTO = "photo";
     public static final String TYPE_MAP = "location";
     public static final String TYPE_VIDEO = "video";
+    public static final String TYPE_POLL = "poll";
 
     public static final String TAG_TYPE = "type";
     public static final String TAG_TEXT = "message";
@@ -125,42 +128,16 @@ public class Message {
         return message;
     }
 
-    public static Map<String, String> makeContent(String text) {
-        Map<String, String> content = new HashMap<>();
-        content.put(TAG_TYPE, TYPE_TEXT);
-        content.put(TAG_TEXT, text);
-        return content;
-    }
-
-    public static Map<String, String> makeContent(Location location) {
-        Map<String, String> content = new HashMap<>();
-        content.put(TAG_TYPE, TYPE_MAP);
-        content.put(TAG_LATITUDE, String.format(Locale.ENGLISH, "%.6f", location.getLatitude()));
-        content.put(TAG_LONGITUDE, String.format(Locale.ENGLISH, "%.6f", location.getLongitude()));
-        return content;
-    }
-
-    public static Map<String, String> makeVideoContent() {
-        Map<String, String> content = new HashMap<>();
-        content.put(TAG_TYPE, TYPE_VIDEO);
-        return content;
-    }
-
-    public static Map<String, String> makePhotoContent() {
-        Map<String, String> content = new HashMap<>();
-        content.put(TAG_TYPE, TYPE_PHOTO);
-        return content;
-    }
-
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return null != mmxMessage ? mmxMessage.toString() : "";
     }
 
     public static List<Message> fromMMXMessages(List<MMXMessage> mmxMessageList) {
         List<Message> messages = null;
-        if(null != mmxMessageList && !mmxMessageList.isEmpty()) {
+        if (null != mmxMessageList && !mmxMessageList.isEmpty()) {
             messages = new ArrayList<>(mmxMessageList.size());
-            for(MMXMessage mmxMessage : mmxMessageList) {
+            for (MMXMessage mmxMessage : mmxMessageList) {
                 messages.add(Message.createMessageFrom(mmxMessage));
             }
         } else {
