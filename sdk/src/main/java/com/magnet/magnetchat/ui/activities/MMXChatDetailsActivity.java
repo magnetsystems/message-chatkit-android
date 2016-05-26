@@ -3,6 +3,7 @@ package com.magnet.magnetchat.ui.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -12,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 import com.magnet.magnetchat.ChatSDK;
-import com.magnet.magnetchat.Constants;
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.helpers.BundleHelper;
 import com.magnet.magnetchat.presenters.MMXChannelSettingsContract;
@@ -20,9 +20,13 @@ import com.magnet.magnetchat.ui.fragments.MMXUserListFragment;
 import com.magnet.mmx.client.api.MMXChannel;
 
 /**
+ * See static method how to create activity intent;
+ *
+ * @see MMXChatDetailsActivity.createIntent
+ * <p/>
  * Created by aorehov on 12.05.16.
  */
-public class MMXChatDetailsActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener, MMXChannelSettingsContract.View {
+public class MMXChatDetailsActivity extends MMXBaseActivity implements CompoundButton.OnCheckedChangeListener, MMXChannelSettingsContract.View {
 
     private static final int RC_ADD_USERS = 0xFC00;
     private MMXUserListFragment userListFragment;
@@ -108,8 +112,6 @@ public class MMXChatDetailsActivity extends BaseActivity implements CompoundButt
         uiMute.setOnCheckedChangeListener(this);
         return true;
     }
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -117,9 +119,8 @@ public class MMXChatDetailsActivity extends BaseActivity implements CompoundButt
             return true;
         } else if (item.getItemId() == R.id.mmx_add) {
             if (channel != null) {
-                Bundle bundle = BundleHelper.packChannel(channel);
-                Intent intent = new Intent(this, MMXUsersActivity.class);
-                intent.putExtras(bundle);
+                Intent intent = MMXUsersActivity.createActivityIntent(this, channel);
+                if (intent == null) return true;
                 startActivityForResult(intent, RC_ADD_USERS);
             }
             return true;
@@ -135,13 +136,6 @@ public class MMXChatDetailsActivity extends BaseActivity implements CompoundButt
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         presenter.doMute(isChecked);
-    }
-
-    public static Intent createIntent(Context context, MMXChannel mmxChannel) {
-        Bundle bundle = BundleHelper.packChannel(mmxChannel);
-        Intent intent = new Intent(context, MMXChatDetailsActivity.class);
-        intent.putExtras(bundle);
-        return intent;
     }
 
     @Override
@@ -186,5 +180,23 @@ public class MMXChatDetailsActivity extends BaseActivity implements CompoundButt
     @Override
     public void showMessage(int resId, Object... objects) {
         toast(getString(resId, objects));
+    }
+
+//    ===========================================================
+//    static methods
+//    ===========================================================
+
+    /**
+     * @param mmxChannel instance of MMXChannel
+     * @return MMXChatDetailsDetailsActivity intent or null
+     * @see MMXChannel
+     */
+    @Nullable
+    public static Intent createIntent(Context context, MMXChannel mmxChannel) {
+        Bundle bundle = BundleHelper.packChannel(mmxChannel);
+        if (bundle == null) return null;
+        Intent intent = new Intent(context, MMXChatDetailsActivity.class);
+        intent.putExtras(bundle);
+        return intent;
     }
 }

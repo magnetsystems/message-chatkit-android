@@ -1,5 +1,6 @@
 package com.magnet.magnetchat.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.widget.SearchView;
 
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.helpers.BundleHelper;
-import com.magnet.magnetchat.helpers.IntentHelper;
 import com.magnet.magnetchat.model.MMXUserWrapper;
 import com.magnet.magnetchat.presenters.UserListContract;
 import com.magnet.magnetchat.ui.fragments.MMXAllUserListFragment;
@@ -27,9 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Use static method for creation if activity instance
+ * <p/>
  * Created by aorehov on 13.05.16.
  */
-public class MMXUsersActivity extends BaseActivity implements UserListContract.OnSelectUserEvent, UserListContract.OnGetAllSelectedUsersListener {
+public class MMXUsersActivity extends MMXBaseActivity implements UserListContract.OnSelectUserEvent, UserListContract.OnGetAllSelectedUsersListener {
 
     private MMXUserListFragment userListFragment;
     private Handler handler = new Handler();
@@ -150,10 +152,43 @@ public class MMXUsersActivity extends BaseActivity implements UserListContract.O
                     }
                 });
             } else {
-                Intent intent = IntentHelper.chatActivity(this, users, MMXChatActivity.class);
+                Intent intent = MMXChatActivity.createIntent(this, users);
+
+                if (intent == null) {
+                    showMessage("Can't open chat. The list of users is empty!");
+                    return;
+                }
+
                 finish();
                 startActivity(intent);
             }
         }
     }
+
+//  ==============================================================
+//  Static methods
+//  ==============================================================
+
+    /**
+     * The method creates intent for MMXUsersActivity for channel MMXChannel
+     *
+     * @param mmxChannel
+     * @return instance of Intent if channel isn't null or null
+     */
+    public static Intent createActivityIntent(Context context, MMXChannel mmxChannel) {
+        Bundle bundle = BundleHelper.packChannel(mmxChannel);
+        if (bundle == null) return null;
+        Intent intent = new Intent(context, MMXUsersActivity.class);
+        intent.putExtras(bundle);
+        return intent;
+    }
+
+    /**
+     * @param context
+     * @return
+     */
+    public static Intent createActivityIntent(Context context) {
+        return new Intent(context, MMXUsersActivity.class);
+    }
+
 }

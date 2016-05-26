@@ -1,4 +1,4 @@
-package com.magnet.magnetchat.ui.views.section.channels;
+package com.magnet.magnetchat.ui.views.channels;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,7 +18,6 @@ import android.widget.ProgressBar;
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.filters.ArrayFilter;
 import com.magnet.magnetchat.presenters.ChannelsListContract;
-import com.magnet.magnetchat.ui.views.AbstractChannelsView;
 import com.magnet.magnetchat.ui.custom.AdapteredRecyclerView;
 import com.magnet.mmx.client.api.MMX;
 import com.magnet.mmx.client.api.MMXChannel;
@@ -68,6 +67,7 @@ public class DefaultChannelsView extends AbstractChannelsView {
         protected int dimenTextMessage;
         protected int dimenTextTime;
         protected boolean isAttributed;
+        protected String factory_name;
 
         private Attributes() {
             isAttributed = false;
@@ -153,6 +153,10 @@ public class DefaultChannelsView extends AbstractChannelsView {
             return isNeedBoldHeader;
         }
 
+        public String getFactoryName() {
+            return factory_name;
+        }
+
     }
 
     AdapteredRecyclerView recyclerView;
@@ -222,6 +226,7 @@ public class DefaultChannelsView extends AbstractChannelsView {
                     attr.dimenTextMessage =
                             attributes.getDimensionPixelSize(R.styleable.DefaultChannelsView_dimenTextChatsMessage, R.dimen.text_16);
 
+                    attr.factory_name = attributes.getString(R.styleable.DefaultChannelsView_factory_name);
 
                 }
             } finally {
@@ -279,6 +284,8 @@ public class DefaultChannelsView extends AbstractChannelsView {
 
     @Override
     protected String getPresenterName() {
+        Attributes instance = Attributes.getInstance();
+        if (instance != null) return instance.factory_name;
         return null;
     }
 

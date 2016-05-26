@@ -1,4 +1,4 @@
-package com.magnet.magnetchat.ui.views.section.login;
+package com.magnet.magnetchat.ui.views.login;
 
 import android.content.Context;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.core.managers.InternetConnectionManager;
 import com.magnet.magnetchat.helpers.UserHelper;
-import com.magnet.magnetchat.helpers.UserInterfaceHelper;
 import com.magnet.magnetchat.ui.views.abs.BaseView;
 import com.magnet.magnetchat.util.Logger;
 import com.magnet.max.android.ApiError;
@@ -98,8 +97,8 @@ public class LoginView extends BaseView<LoginViewProperties> {
      */
     private void startLogIn() {
         if (InternetConnectionManager.getInstance().isAnyConnectionAvailable()) {
-            final String email = UserInterfaceHelper.getStringFromField(editEmail);
-            final String password = UserInterfaceHelper.getStringFromField(editPassword);
+            final String email = editEmail.getText().toString();
+            final String password = editPassword.getText().toString();
             boolean shouldRemember = checkBoxRememberMe.isChecked();
             if (checkStrings(email, password)) {
                 switchLoginProgressView(true);

@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.helpers.BundleHelper;
-import com.magnet.magnetchat.helpers.IntentHelper;
 import com.magnet.magnetchat.presenters.PostMMXMessageContract;
 import com.magnet.magnetchat.presenters.updated.ChatListContract;
 import com.magnet.magnetchat.ui.fragments.MMXChatFragment;
@@ -23,9 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The MMXChatActivity displays and manage chat view
+ * <p/>
+ * Use static method fot creation of activity instance
+ *
+ * @see MMXChatActivity.createIntent
+ * <p/>
  * Created by aorehov on 04.05.16.
  */
-public class MMXChatActivity extends BaseActivity implements ChatListContract.ChannelNameListener {
+public class MMXChatActivity extends MMXBaseActivity implements ChatListContract.ChannelNameListener {
 
     private MMXChatFragment chatFragment;
 
@@ -65,24 +70,26 @@ public class MMXChatActivity extends BaseActivity implements ChatListContract.Ch
             }
         });
 
-        Bundle bundle = null;
-        MMXChannel channel = IntentHelper.getMMXChannelFromIntent(getIntent());
+        Bundle extras = getIntent().getExtras();
+        Bundle fragmentBundle = null;
+
+        MMXChannel channel = BundleHelper.readMMXChannelFromBundle(extras);
         if (channel != null) {
-            bundle = BundleHelper.packChannel(channel);
+            fragmentBundle = BundleHelper.packChannel(channel);
         }
 
-        if (bundle == null) {
-            ArrayList<User> list = IntentHelper.getRecipientsFromIntent(getIntent());
-            bundle = BundleHelper.packRecipients(list);
+        if (fragmentBundle == null) {
+            ArrayList<User> list = BundleHelper.readRecipients(extras);
+            fragmentBundle = BundleHelper.packRecipients(list);
         }
 
-        if (bundle == null) {
+        if (fragmentBundle == null) {
             finish();
             return;
         }
 
         chatFragment = new MMXChatFragment();
-        chatFragment.setArguments(bundle);
+        chatFragment.setArguments(fragmentBundle);
         chatFragment.setChatNameListener(this);
         replace(chatFragment, R.id.mmx_chat, chatFragment.getTag());
     }
@@ -91,14 +98,6 @@ public class MMXChatActivity extends BaseActivity implements ChatListContract.Ch
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_chat, menu);
         return true;
-    }
-
-    public static Intent createIntent(Context context, @NonNull MMXChannel mmxChannel) {
-        return IntentHelper.chatActivity(context, mmxChannel, MMXChatActivity.class);
-    }
-
-    public static Intent createIntent(Context context, @NonNull List<User> recipients) {
-        return IntentHelper.chatActivity(context, recipients, MMXChatActivity.class);
     }
 
     void onSetName(CharSequence sequence) {
@@ -134,5 +133,39 @@ public class MMXChatActivity extends BaseActivity implements ChatListContract.Ch
     @Override
     public void onName(String name) {
         onSetName(name);
+    }
+
+//    ===========================================================
+//    static method
+//    ===========================================================
+
+    /**
+     * The method creates MMXChatActivity intent for channel
+     *
+     * @param mmxChannel instance of mmxChannel
+     * @return activity intent or null if channel is null
+     */
+    public static Intent createIntent(Context context, @NonNull MMXChannel mmxChannel) {
+        if (mmxChannel == null) return null;
+
+        Bundle bundle = BundleHelper.packChannel(mmxChannel);
+        Intent intent = new Intent(context, MMXChatActivity.class);
+        intent.putExtras(bundle);
+
+        return intent;
+    }
+
+    /**
+     * The method creates MMXChatActivity intent for channel
+     *
+     * @param recipients
+     * @return activity intent or null if channel is null
+     */
+    public static Intent createIntent(Context context, @NonNull List<User> recipients) {
+        Bundle bundle = BundleHelper.packRecipients(recipients);
+        if (bundle == null) return null;
+        Intent intent = new Intent(context, MMXChatActivity.class);
+        intent.putExtras(bundle);
+        return intent;
     }
 }
