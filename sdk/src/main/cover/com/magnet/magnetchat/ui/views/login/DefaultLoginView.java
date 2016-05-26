@@ -20,13 +20,12 @@ import android.widget.ProgressBar;
 
 import com.magnet.magnetchat.R;
 import com.magnet.magnetchat.presenters.LoginContract;
+import com.magnet.magnetchat.ui.views.abs.BasePresenterView;
 
 /**
  * Created by dlernatovich on 3/11/16.
  */
 public class DefaultLoginView extends AbstractLoginView {
-
-    private LoginContract.OnLoginActionCallback loginActionCallback;
 
     AppCompatEditText editEmail;
     AppCompatEditText editPassword;
@@ -100,6 +99,7 @@ public class DefaultLoginView extends AbstractLoginView {
     public void onClick(View v) {
         hideKeyboard();
         if (v.getId() == R.id.buttonRegister) {
+            LoginContract.OnLoginActionCallback loginActionCallback = getLoginActionCallback();
             if (loginActionCallback != null) {
                 loginActionCallback.onRegisterPressed();
             }
@@ -307,27 +307,6 @@ public class DefaultLoginView extends AbstractLoginView {
         return checkBoxRemember.isChecked();
     }
 
-    /**
-     * Method which provide to getting of the login callback
-     *
-     * @return login callback
-     */
-    @Nullable
-    @Override
-    public LoginContract.OnLoginActionCallback getActionCallback() {
-        return loginActionCallback;
-    }
-
-    //=================| SETTERS |=================
-
-    /**
-     * Method which provide the setting of the login callback
-     *
-     * @param loginActionCallback
-     */
-    public void setLoginActionCallback(LoginContract.OnLoginActionCallback loginActionCallback) {
-        this.loginActionCallback = loginActionCallback;
-    }
 
 
     //EXAMPLES:

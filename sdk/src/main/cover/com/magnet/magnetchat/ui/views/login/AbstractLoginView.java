@@ -2,6 +2,7 @@ package com.magnet.magnetchat.ui.views.login;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import com.magnet.magnetchat.ChatSDK;
@@ -15,6 +16,7 @@ import com.magnet.magnetchat.presenters.core.MMXPresenterFactory;
  */
 public abstract class AbstractLoginView extends BasePresenterView<LoginContract.Presenter> implements LoginContract.View {
 
+    private LoginContract.OnLoginActionCallback loginActionCallback;
     //VARIABLES
     private RegisterContract.OnRegisterActionCallback registerActionCallback;
 
@@ -84,6 +86,31 @@ public abstract class AbstractLoginView extends BasePresenterView<LoginContract.
 
     protected void startLogin() {
         presenter.startLogIn();
+    }
+
+    /**
+     * Method which provide the setting of the login callback
+     *
+     * @param loginActionCallback
+     */
+    public void setLoginActionCallback(LoginContract.OnLoginActionCallback loginActionCallback) {
+        this.loginActionCallback = loginActionCallback;
+    }
+
+    public LoginContract.OnLoginActionCallback getLoginActionCallback() {
+        return loginActionCallback;
+    }
+
+
+    /**
+     * Method which provide to getting of the login callback
+     *
+     * @return login callback
+     */
+    @Nullable
+    @Override
+    public LoginContract.OnLoginActionCallback getActionCallback() {
+        return loginActionCallback;
     }
 
 }
