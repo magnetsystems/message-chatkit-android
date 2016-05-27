@@ -5,6 +5,8 @@ package com.magnet.magnetchat;
  */
 public interface Constants {
 
+    String ACTION_CHAT = "com.magnet.magnetchat.CHAT";
+
     int CONVERSATION_PAGE_SIZE = 20;
 
     int MESSAGE_PAGE_SIZE = 30;
@@ -31,5 +33,6 @@ public interface Constants {
 
     int MMX_RC_TAKE_PIC = 0x00F0;
     int MMX_RC_CREATE_POLL = 0x00F1;
+    int MMX_RC_GET_PIC = 0x00F4;
     String NA = "NA";
 }
