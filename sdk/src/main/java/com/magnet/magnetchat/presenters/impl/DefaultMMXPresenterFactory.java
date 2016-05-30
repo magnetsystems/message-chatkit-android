@@ -1,9 +1,12 @@
 package com.magnet.magnetchat.presenters.impl;
 
+import android.content.Context;
+
 import com.magnet.magnetchat.ChatSDK;
 import com.magnet.magnetchat.model.MMXMessageWrapper;
 import com.magnet.magnetchat.model.MMXUserWrapper;
 import com.magnet.magnetchat.model.converters.BaseConverter;
+import com.magnet.magnetchat.persistence.core.MMXPersistenceFactory;
 import com.magnet.magnetchat.presenters.ChannelsListContract;
 import com.magnet.magnetchat.presenters.EditProfileContract;
 import com.magnet.magnetchat.presenters.LoginContract;
@@ -36,9 +39,10 @@ public class DefaultMMXPresenterFactory implements MMXPresenterFactory, MMXMessa
     }
 
     @Override
-    public ChatListContract.Presenter createChatPresenter(ChatListContract.View view) {
+    public ChatListContract.Presenter createChatPresenter(Context context, ChatListContract.View view) {
         BaseConverter<MMXMessage, MMXMessageWrapper> converter = ChatSDK.getMmxObjectConverterFactory().createMMXMessageConverter();
-        return new ChatListV2PresenterImpl(view, converter);
+        MMXPersistenceFactory factory = ChatSDK.getMMXPersistenceFactory();
+        return new ChatListV2PresenterImpl(view, converter, factory.getAppScopePendingStateRepository());
     }
 
     @Override
@@ -86,7 +90,8 @@ public class DefaultMMXPresenterFactory implements MMXPresenterFactory, MMXMessa
 
     @Override
     public ChannelsListContract.Presenter createChannelListPresenter(ChannelsListContract.View view) {
-        return new DefaultChannelsPresenter(view);
+        MMXPersistenceFactory factory = ChatSDK.getMMXPersistenceFactory();
+        return new DefaultChannelsPresenter(view, factory.getAppScopePendingStateRepository());
     }
 
     @Override

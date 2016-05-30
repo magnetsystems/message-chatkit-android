@@ -1,9 +1,12 @@
 package com.magnet.magnetchat.ui.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,8 +19,11 @@ import com.google.android.gms.location.LocationServices;
 import com.magnet.magnetchat.ChatSDK;
 import com.magnet.magnetchat.Constants;
 import com.magnet.magnetchat.R;
+import com.magnet.magnetchat.helpers.BitmapHelper;
 import com.magnet.magnetchat.helpers.BundleHelper;
+import com.magnet.magnetchat.helpers.FileHelper;
 import com.magnet.magnetchat.helpers.IntentHelper;
+import com.magnet.magnetchat.model.Message;
 import com.magnet.magnetchat.presenters.PostMMXMessageContract;
 import com.magnet.magnetchat.presenters.updated.ChatListContract;
 import com.magnet.magnetchat.ui.activities.MMXEditPollActivity;
@@ -25,6 +31,7 @@ import com.magnet.magnetchat.ui.dialogs.AttachmentDialogFragment;
 import com.magnet.magnetchat.ui.views.chatlist.MMXChatView;
 import com.magnet.magnetchat.ui.views.chatlist.MMXPostMessageView;
 import com.magnet.magnetchat.util.Utils;
+import com.magnet.max.android.Max;
 import com.magnet.max.android.User;
 import com.magnet.mmx.client.api.MMXChannel;
 
@@ -43,6 +50,7 @@ public class MMXChatFragment extends MMXBaseFragment {
 
     private List<String> attachments;
     private GoogleApiClient googleApiClient;
+    private String picPath;
 
     @Override
     protected int getLayoutId() {
@@ -130,10 +138,26 @@ public class MMXChatFragment extends MMXBaseFragment {
         return mmxChatView.getPostPresenter();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!mmxChatView.onActivityResult(requestCode & 0xFF, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        PostMMXMessageContract.Presenter presenter = getMessageContract();
+        if (requestCode == Constants.MMX_RC_CREATE_POLL && resultCode == Activity.RESULT_OK) {
+            mmxChatView.onCreatedPoll();
+        } else if (requestCode == Constants.MMX_RC_TAKE_PIC) {
+            if (resultCode == Activity.RESULT_OK && picPath != null) {
+                Uri uri = Uri.parse(picPath);
+                String mimeType = FileHelper.getMimeType(Max.getApplicationContext(), uri, picPath, Message.FILE_TYPE_PHOTO);
+                presenter.sendPhotoMessage(picPath, mimeType);
+            }
+            picPath = null;
+        } else if (requestCode == Constants.MMX_RC_GET_PIC && resultCode == Activity.RESULT_OK) {
+            Uri uri = intent.getData();
+            String path = BitmapHelper.getBitmapPath(getContext(), uri);
+            if (path != null) {
+                String mimeType = FileHelper.getMimeType(Max.getApplicationContext(), uri, path, Message.FILE_TYPE_PHOTO);
+                presenter.sendPhotoMessage(path, mimeType);
+            } else {
+                showMessage("Cant read pic from gallery");
+            }
         }
     }
 
@@ -157,7 +181,7 @@ public class MMXChatFragment extends MMXBaseFragment {
         int indexOf = attachments.indexOf(attachment);
         switch (indexOf) {
             case 0:
-                openChoosePicture();
+                openTakePicture();
                 break;
             case 1:
                 openGallery();
@@ -168,7 +192,6 @@ public class MMXChatFragment extends MMXBaseFragment {
             case 3:
                 openPollCreator();
                 break;
-
         }
     }
 
@@ -207,8 +230,10 @@ public class MMXChatFragment extends MMXBaseFragment {
         toast(s);
     }
 
-    protected void openChoosePicture() {
-        Intent intent = IntentHelper.photoCapture();
+    protected void openTakePicture() {
+        picPath = BitmapHelper.generatePathForPicture();
+        Intent intent = IntentHelper.photoCapture(picPath);
+
         getActivity().startActivityForResult(intent, Constants.MMX_RC_TAKE_PIC);
     }
 
