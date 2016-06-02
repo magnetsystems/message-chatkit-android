@@ -9,8 +9,8 @@ import com.magnet.magnetchat.model.MMXPollOptionWrapper;
 import com.magnet.magnetchat.model.converters.BaseConverter;
 import com.magnet.magnetchat.presenters.chatlist.MMXPollContract;
 import com.magnet.mmx.client.api.MMX;
-import com.magnet.mmx.client.api.MMXChannel;
 import com.magnet.mmx.client.api.MMXMessage;
+import com.magnet.mmx.client.api.MMXChannel;
 import com.magnet.mmx.client.ext.poll.MMXPoll;
 import com.magnet.mmx.client.ext.poll.MMXPollOption;
 
