@@ -160,9 +160,6 @@ public class MMXUsersActivity extends MMXBaseActivity implements UserListContrac
                     toast("Can't open chat. The list of users is empty!");
                     return;
                 }
-
-                finish();
-                startActivity(intent);
             }
         } else {
             toast("Please select at least one user");
